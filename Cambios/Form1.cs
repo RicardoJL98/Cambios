@@ -9,12 +9,29 @@ namespace Cambios
     using Newtonsoft.Json;
     using Modelos;
     using System.Collections.Generic;
+    using Cambios.Servicos;
+    using System.Threading.Tasks;
 
     public partial class Form1 : Form
     {
+        #region Atributos
+
+
+        private NetworkService networkService;
+
+        private ApiService apiService;
+
+
+        #endregion
+
+        public List<Rate> Rates { get; set; } = new List<Rate>();
+
+
         public Form1()
         {
             InitializeComponent();
+            networkService = new NetworkService(); // já instanciamos o nosso atributo
+            apiService = new ApiService();
             LoadRates();
         }
 
@@ -22,48 +39,43 @@ namespace Cambios
         {
             //bool load; // variável que controla se o load foi feito ou não
 
-            ProgressBar1.Value = 0; // para a progressbar começar no 0
+            LabelResultado.Text = "A atualizar taxas...";
 
-            // Para carregar a API vamos ter que criar uma variável
-            var client = new HttpClient();
-            // primeira cois a fazer é criar a conexão via Http
-            client.BaseAddress = new Uri("http://cambios.somee.com");
-            // aqui em cima colocamos o nosso endereço base da API
+            var connection = networkService.CheckConection(); // aqui vamos testar a conexão
 
-            // agora vamos buscar o controlador
-            var response = await client.GetAsync("/api/rates");
-            // enquanto estamos a carregar as taxas queremos que o progrma esteja a correr então colocamos await à frente e async
-            // fazemos isto pois queremos que a aplicação não pare de correr enquanto carrega as taxas
-            // ele quando devolve vai devolver algo para dentro do objeto (response)
-
-            var result = await response.Content.ReadAsStringAsync();
-            // variável que vai ficar à espera da resposta que vem de cima, queremos o seu conteúdo lido como uma string
-            // carregamos os resultados no formato de uma string para dentro do objeto (result)
-
-            if (!response.IsSuccessStatusCode) // se algo correr mal
+            if (!connection.IsSucess) // se esta resposta não teve sucesso
             {
-                MessageBox.Show(response.ReasonPhrase); // aqui aparece o erro que se terá passado
+                MessageBox.Show(connection.Message);
                 return;
             }
+            else
+            {
+                await LoadApiRates();
+            }
 
-            // se ele passar é porque correu bem
 
-            var rates = JsonConvert.DeserializeObject<List<Rate>>(result);
-            //Colocamos o jason numa lista que vai guardar os dados do tipo Rate
-
-            ComboBoxOrigem.DataSource = rates; // Dizemos para a combobox ir buscar os dados a rates
+            ComboBoxOrigem.DataSource = Rates; // Dizemos para a combobox ir buscar os dados a rates
             ComboBoxOrigem.DisplayMember = "Name";  // Assim mostramos o nome das moedas
 
             ComboBoxDestino.BindingContext = new BindingContext(); // Para corrigir o bug das combobox que cada vez que se seleciona um item numa fica automaticamente selecionado na outra
             // assim com esta classe dizemos que a combobox destino tem um biding diferente da de origem
 
-            ComboBoxDestino.DataSource = rates; // Dizemos para a combobox ir buscar os dados a rates
+            ComboBoxDestino.DataSource = Rates; // Dizemos para a combobox ir buscar os dados a rates
             ComboBoxDestino.DisplayMember = "Name"; // Assim mostramos o nome das moedas
 
             ProgressBar1.Value = 100; // depois de todo o processo a progress bar carrega-se
 
+            LabelResultado.Text = "Taxas carregadas...";
 
+        }
 
+        private async Task LoadApiRates()
+        {
+            ProgressBar1.Value = 0;
+
+            var response = await apiService.GetRates("http://cambios.somee.com", "/api/rates");
+
+            Rates = (List<Rate>)response.Result;
         }
     }
 }
