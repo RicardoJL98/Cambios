@@ -22,6 +22,8 @@ namespace Cambios
         {
             //bool load; // variável que controla se o load foi feito ou não
 
+            ProgressBar1.Value = 0; // para a progressbar começar no 0
+
             // Para carregar a API vamos ter que criar uma variável
             var client = new HttpClient();
             // primeira cois a fazer é criar a conexão via Http
@@ -49,10 +51,16 @@ namespace Cambios
             var rates = JsonConvert.DeserializeObject<List<Rate>>(result);
             //Colocamos o jason numa lista que vai guardar os dados do tipo Rate
 
-            ComboBoxOrigem.DataSource = rates;
+            ComboBoxOrigem.DataSource = rates; // Dizemos para a combobox ir buscar os dados a rates
+            ComboBoxOrigem.DisplayMember = "Name";  // Assim mostramos o nome das moedas
 
+            ComboBoxDestino.BindingContext = new BindingContext(); // Para corrigir o bug das combobox que cada vez que se seleciona um item numa fica automaticamente selecionado na outra
+            // assim com esta classe dizemos que a combobox destino tem um biding diferente da de origem
 
+            ComboBoxDestino.DataSource = rates; // Dizemos para a combobox ir buscar os dados a rates
+            ComboBoxDestino.DisplayMember = "Name"; // Assim mostramos o nome das moedas
 
+            ProgressBar1.Value = 100; // depois de todo o processo a progress bar carrega-se
 
 
 
