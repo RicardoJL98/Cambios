@@ -24,6 +24,8 @@ namespace Cambios
 
         private DialogService dialogService;
 
+        private DataService dataService;
+
 
         #endregion
 
@@ -33,6 +35,7 @@ namespace Cambios
             networkService = new NetworkService(); // já instanciamos o nosso atributo
             apiService = new ApiService();
             dialogService = new DialogService();
+            dataService = new DataService();
             LoadRates();
         }
 
@@ -62,6 +65,9 @@ namespace Cambios
                 LabelResultado.Text = "Não há ligação à internet" + Environment.NewLine +
                                       "e não foram previamente carregadas as taxas." + Environment.NewLine +
                                       "Tente mais tarde";
+
+                LabelStatuts.Text = "Primeira inicialização deverá ter ligação à internet";
+
                 return;
             }
 
@@ -94,11 +100,20 @@ namespace Cambios
 
         }
 
+        /// <summary>
+        /// Carrega as taxas da base de dados local
+        /// </summary>
         private void LoadLocalRates()
         {
-            MessageBox.Show("Não está implementado");
+            Rates = dataService.GetData();
+            // Como retorna uma lista vamos ter de adaptar
+            // Fazendo Rates =, carregamos diretamente a lista deste lado
         }
 
+        /// <summary>
+        /// Carrega as taxas da Api quando temos ligação à internet
+        /// </summary>
+        /// <returns></returns>
         private async Task LoadApiRates()
         {
             ProgressBar1.Value = 0;
@@ -106,6 +121,10 @@ namespace Cambios
             var response = await apiService.GetRates("http://cambios.somee.com", "/api/rates");
 
             Rates = (List<Rate>)response.Result;
+
+            dataService.DeleteData(); // Primeiro apaga e depois é que grava as taxas por cima
+
+            dataService.SaveDate(Rates);
         }
 
         private void ButtonConverter_Click(object sender, EventArgs e)

@@ -100,7 +100,7 @@ namespace Cambios
             // 
             this.ButtonConverter.Enabled = false;
             this.ButtonConverter.Font = new System.Drawing.Font("Arial Rounded MT Bold", 14.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.ButtonConverter.Location = new System.Drawing.Point(555, 60);
+            this.ButtonConverter.Location = new System.Drawing.Point(527, 60);
             this.ButtonConverter.Name = "ButtonConverter";
             this.ButtonConverter.Size = new System.Drawing.Size(139, 57);
             this.ButtonConverter.TabIndex = 6;
@@ -138,7 +138,7 @@ namespace Cambios
             // 
             this.buttonTrocar.Enabled = false;
             this.buttonTrocar.Image = ((System.Drawing.Image)(resources.GetObject("buttonTrocar.Image")));
-            this.buttonTrocar.Location = new System.Drawing.Point(583, 153);
+            this.buttonTrocar.Location = new System.Drawing.Point(553, 153);
             this.buttonTrocar.Name = "buttonTrocar";
             this.buttonTrocar.Size = new System.Drawing.Size(83, 65);
             this.buttonTrocar.TabIndex = 10;
